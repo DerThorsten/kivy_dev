@@ -35,7 +35,7 @@ class TopCtrlWidget(BoxLayout):
     pass
 
 
-class BoxStencil(BoxLayout, StencilView):
+class BoxStencil(BoxLayout):
     pass
 
 Builder.load_string("""
@@ -51,9 +51,17 @@ Builder.load_string("""
             #BoxLayout:
             PaintAreaWidget:
                 id: paintAreaWidget
+                canvas:
+                    Color:
+                        rgba: 1, .3, .8, .5
+                    Rectangle:
+                        pos: self.pos
+                        size: self.size
     TopCtrlWidget:
         size_hint: (1,0.1)
         id: topCtrlWidget
+
+
 """
 )
 class PaintWidget(BoxLayout):
