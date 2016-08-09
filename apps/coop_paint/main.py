@@ -21,7 +21,8 @@ class PaintAreaWidget(BoxLayout):
         
 
     def on_touch_move(self, touch):
-        touch.ud['line'].points += [touch.x, touch.y]
+        if 'line' in touch.ud:
+            touch.ud['line'].points += [touch.x, touch.y]
 
 
 Builder.load_string("""
@@ -42,13 +43,16 @@ Builder.load_string("""
     orientation: 'vertical'
     TopCtrlWidget:
         id: topCtrlWidget
+        size_hint: (1,0.1)
     BoxStencil:
-        ScatterPlaneLayout:
+        size_hint: (1,0.1)
+        ScatterLayout:
             translation_touches: 2
-            BoxLayout:
-                PaintAreaWidget:
-                    id: paintAreaWidget
+            #BoxLayout:
+            PaintAreaWidget:
+                id: paintAreaWidget
     TopCtrlWidget:
+        size_hint: (1,0.1)
         id: topCtrlWidget
 """
 )
