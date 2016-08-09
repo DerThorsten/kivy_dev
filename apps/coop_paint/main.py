@@ -45,7 +45,7 @@ Builder.load_string("""
         id: topCtrlWidget
         size_hint: (1,0.1)
     BoxStencil:
-        size_hint: (1,0.1)
+        size_hint: (1,0.8)
         ScatterLayout:
             translation_touches: 2
             #BoxLayout:
