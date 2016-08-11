@@ -15,23 +15,40 @@ from kivy.properties import *
 from kivy.graphics.instructions import Instruction,InstructionGroup
 from ctrl_widget import CtrlWidget
 
+import math
+
 import numpy
 
 
 
-def distancePointLineSegment(lStatrt, lEnd, point): # p3 is the point
-    x0, y0 = lStatrt
-    x1, y1 = lEnd
-    x2, y2 = point
-    nom = abs((y2 - y1) * x0 - (x2 - x1) * y0 + x2 * y1 - y2 * x1)
-    denom = ((y2 - y1)**2 + (x2 - x1) ** 2) ** 0.5
-    if (denom <= 0.00001):
-        return 0.0
-    result = nom / denom
-    return result
+def dist(x1,y1, x2,y2, x3,y3): # x3,y3 is the point
+    px = x2-x1
+    py = y2-y1
 
+    something = px*px + py*py
 
+    u =  ((x3 - x1) * px + (y3 - y1) * py) / float(something)
 
+    if u > 1:
+        u = 1
+    elif u < 0:
+        u = 0
+
+    x = x1 + u * px
+    y = y1 + u * py
+
+    dx = x - x3
+    dy = y - y3
+
+    # Note: If the actual distance does not matter,
+    # if you only want to compare what this function
+    # returns to other results of this function, you
+    # can just return the squared distance instead
+    # (i.e. remove the sqrt) to gain a little performance
+
+    dist = math.sqrt(dx*dx + dy*dy)
+
+    return dist
 
 class ScatterPolyLine(Scatter):
     def __init__(self,**kwargs):
@@ -51,7 +68,7 @@ class ScatterPolyLine(Scatter):
             #print minDist
 
             
-            if minDist<0.3:
+            if minDist<5.0:
                 return True
         else:
             return  False
@@ -133,7 +150,7 @@ class PolyLineWidget(RelativeLayout):
             lStatrt = self.points[c,:]
             lEnd = self.points[c+1,:]
 
-            d = min(distancePointLineSegment(lStatrt, lEnd, p), d)
+            d = min(dist(lStatrt[0],lStatrt[1], lEnd[0], lEnd[1], p[0], p[1]), d)
 
         return d
             
@@ -147,14 +164,11 @@ class PaintAreaBackgroundWidget(RelativeLayout):
 
         self.lineGroup = None
         self.line = None
-        self.doPaint = True
-        self.useLastTouch = True
 
-        self.addedOne = False
 
     def on_touch_down(self, touch):
         #print "using touch in bg"
-        if not self.addedOne and self.doPaint and self.collide_point(*touch.pos):
+        if self.collide_point(*touch.pos):
             width = self.lineWidth
             self.lineGroup = InstructionGroup()
             #print self.lineGroup
@@ -162,32 +176,28 @@ class PaintAreaBackgroundWidget(RelativeLayout):
             self.lineGroup.add(Color(*self.selectedColor))
             self.lineGroup.add(self.line)
             self.canvas.add(self.lineGroup)
-            self.useLastTouch = True
-        else:
-            self.useLastTouch = False
-            
+
     def on_touch_move(self, touch):
         #print "MOVE BG"
-        if not self.addedOne and self.doPaint and self.useLastTouch and self.collide_point(*touch.pos):
+        if self.collide_point(*touch.pos):
             self.line.points += [touch.x, touch.y]
 
     def on_touch_up(self, touch):
-        if self.useLastTouch and self.doPaint and self.collide_point(*touch.pos) and len(self.line.points)!=0:
+        if self.collide_point(*touch.pos) and len(self.line.points)!=0:
                 
-            if not self.addedOne:
 
-                self.canvas.remove(self.lineGroup)
+            self.canvas.remove(self.lineGroup)
 
-                lp = numpy.array(self.line.points)
-                scatterPolyLine = ScatterPolyLine(linePoints=lp, lineWidth=self.lineWidth, lineColor=self.selectedColor)
+            lp = numpy.array(self.line.points)
+            scatterPolyLine = ScatterPolyLine(linePoints=lp, lineWidth=self.lineWidth, lineColor=self.selectedColor)
 
 
-                self.line.points = []
-        
-                scatterPolyLine.pos =  [scatterPolyLine.polyLineWidget.minX,
-                                        scatterPolyLine.polyLineWidget.minY]
-                #.size = polyLineWidget.size
-                self.addPaintedThingsWidget.add_widget(scatterPolyLine)
+            self.line.points = []
+    
+            scatterPolyLine.pos =  [scatterPolyLine.polyLineWidget.minX,
+                                    scatterPolyLine.polyLineWidget.minY]
+            #.size = polyLineWidget.size
+            self.addPaintedThingsWidget.add_widget(scatterPolyLine)
                 #self.addedOne = True
 
 class FloatStencil(FloatLayout, StencilView):
