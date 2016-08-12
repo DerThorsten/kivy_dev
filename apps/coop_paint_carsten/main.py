@@ -16,6 +16,7 @@ class MyPaintWidget(Widget):
     color = None
     outgoingSocket = None
     myId = None
+    lock = None
 
     def on_touch_down(self, touch):
         self.color = (random.random(), 1, 1)
@@ -31,7 +32,7 @@ class MyPaintWidget(Widget):
     
     def on_touch_up(self, touch):
         # serialize line and send via server
-        if self.color is not None and len(touch.ud['line'].points) > 0:
+        if self.color is not None and 'line' in touch.ud and len(touch.ud['line'].points) > 0:
             messageDict = {
                 "id": self.myId,
                 "color": list(self.color), 
@@ -39,6 +40,7 @@ class MyPaintWidget(Widget):
             }
             message = json.dumps(messageDict)
             print("Sending message: " + message)
+            with self.lock:
             self.outgoingSocket.send(message)
     
     @mainthread
@@ -46,15 +48,6 @@ class MyPaintWidget(Widget):
         with self.canvas:
             Color(*color, mode='hsv')
             Line(points=points)
-
-def networkReceiver(widget, incomingSocket, myId):
-    print("Starting listener thread")
-    while True:
-        message = incomingSocket.recv()
-        print("received message: " + message)
-        messageDict = json.loads(message)
-        if messageDict['id'] != myId:
-            widget.addLine(messageDict['color'], messageDict['points'])
 
 class MyPaintApp(App):
 
@@ -74,27 +67,43 @@ class MyPaintApp(App):
         self.incomingSocket.connect("tcp://{}:{}".format(serverIp, incomingPort))
         self.incomingSocket.setsockopt(zmq.SUBSCRIBE, "")
     
+    def networkReceiver(self):
+        print("Starting listener thread")
+        while True:
+            with self.lock:
+                try:
+                    message = self.incomingSocket.recv(flags=zmq.NOBLOCK)
+                except zmq.Again:
+                    message = None
+            if message is not None:
+                print("received message: " + message)
+                messageDict = json.loads(message)
+                if messageDict['id'] != self.myId:
+                    self.painter.addLine(messageDict['color'], messageDict['points'])
+    
     def teardownNetwork(self):
-        # Fixme: because the networkReceiver thread doesn't know that the socket is closed, 
-        # it's still trying to read from it and the app will crash when the server is changed.
         self.incomingSocket.close()
-        self.outgointSocket.close()
+        self.outgoingSocket.close()
 
     def build(self):
         """
         Setup networking, start listener thread, and create the main painting widget
         """
-        self.context = zmq.Context()
         self.myId = random.randint(0,100000000)
+        self.lock = threading.Lock()
+
+        with self.lock:
+        self.context = zmq.Context()
         self.networkingSetup()
 
         parent = Widget()
         self.painter = MyPaintWidget()
         self.painter.outgoingSocket = self.outgoingSocket
         self.painter.myId = self.myId
+        self.painter.lock = self.lock
 
         # start thread that waits for network input
-        t = threading.Thread(target=networkReceiver, args=[self.painter, self.incomingSocket, self.myId])
+        t = threading.Thread(target=self.networkReceiver)
         t.setDaemon(True) # daemon threads are killed automatically when the program quits
         t.start()
 
@@ -134,8 +143,10 @@ class MyPaintApp(App):
 
         if section == "CoopPaint":
             if key == "ip":
+                with self.lock:
                 self.teardownNetwork()
                 self.networkingSetup()
+                    self.painter.outgoingSocket = self.outgoingSocket
 
 if __name__ == '__main__':
     MyPaintApp().run()
