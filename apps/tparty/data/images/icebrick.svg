@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="210mm"
+   height="297mm"
+   viewBox="0 0 744.09448819 1052.3622047"
+   id="svg2"
+   version="1.1"
+   inkscape:version="0.91 r13725"
+   inkscape:export-filename="/home/tbeier/src/kivy_dev/apps/tparty/data/images/icebrick.png"
+   inkscape:export-xdpi="489.13043"
+   inkscape:export-ydpi="489.13043">
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="3.959798"
+     inkscape:cx="257.0896"
+     inkscape:cy="610.56337"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     showgrid="true"
+     inkscape:window-width="1615"
+     inkscape:window-height="1026"
+     inkscape:window-x="65"
+     inkscape:window-y="24"
+     inkscape:window-maximized="1">
+    <inkscape:grid
+       type="xygrid"
+       id="grid3350" />
+  </sodipodi:namedview>
+  <defs
+     id="defs4">
+    <linearGradient
+       id="linearGradient5632-6"
+       inkscape:collect="always">
+      <stop
+         id="stop5644"
+         offset="0"
+         style="stop-color:#e8fffc;stop-opacity:0.63461536" />
+      <stop
+         id="stop5646"
+         offset="1"
+         style="stop-color:#99fffc;stop-opacity:0.78205127" />
+    </linearGradient>
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient5632-6"
+       id="linearGradient5640"
+       x1="255"
+       y1="422.36218"
+       x2="295"
+       y2="377.36218"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(3.1795139,0,0,3.1795139,-569.14586,-821.37632)" />
+    <filter
+       inkscape:menu-tooltip="Bright metallic effect for any color"
+       inkscape:menu="Bevels"
+       inkscape:label="Bright Metal"
+       style="color-interpolation-filters:sRGB;"
+       id="filter5855">
+      <feGaussianBlur
+         result="result6"
+         stdDeviation="8"
+         in="SourceGraphic"
+         id="feGaussianBlur5857" />
+      <feComposite
+         in2="SourceGraphic"
+         in="result6"
+         operator="xor"
+         result="result10"
+         id="feComposite5859" />
+      <feGaussianBlur
+         result="result2"
+         stdDeviation="8"
+         id="feGaussianBlur5861" />
+      <feComposite
+         in2="SourceGraphic"
+         operator="atop"
+         in="result10"
+         result="result91"
+         id="feComposite5863" />
+      <feComposite
+         result="result4"
+         in="result2"
+         operator="xor"
+         in2="result91"
+         id="feComposite5865" />
+      <feGaussianBlur
+         in="result4"
+         result="result3"
+         stdDeviation="4"
+         id="feGaussianBlur5867" />
+      <feSpecularLighting
+         result="result5"
+         specularExponent="5"
+         specularConstant="1.1"
+         surfaceScale="18"
+         id="feSpecularLighting5869">
+        <feDistantLight
+           azimuth="235"
+           elevation="55"
+           id="feDistantLight5871" />
+      </feSpecularLighting>
+      <feComposite
+         in="result3"
+         k3="1.1"
+         k2="0.5"
+         operator="arithmetic"
+         result="result7"
+         in2="result5"
+         k1="0.5"
+         id="feComposite5873" />
+      <feComposite
+         in="result7"
+         operator="atop"
+         in2="SourceGraphic"
+         result="result8"
+         id="feComposite5875" />
+    </filter>
+  </defs>
+  <metadata
+     id="metadata7">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     id="layer1"
+     inkscape:groupmode="layer"
+     inkscape:label="Layer 1">
+    <g
+       id="g3341"
+       inkscape:label="Cube:x0.00:x0.00:x0.00:x0.00:x0.00:x0.00"
+       transform="translate(375.0,532.36220472)" />
+    <rect
+       style="fill:url(#linearGradient5640);fill-opacity:1;fill-rule:evenodd;stroke:#aaffee;stroke-width:3.17951393px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;filter:url(#filter5855)"
+       id="rect3360"
+       width="143.07812"
+       height="143.07812"
+       x="225.7326"
+       y="378.452"
+       rx="15.89757"
+       ry="15.89757"
+       inkscape:transform-center-x="60.622618"
+       inkscape:transform-center-y="52.191732"
+       inkscape:export-xdpi="489"
+       inkscape:export-ydpi="489" />
+  </g>
+</svg>
