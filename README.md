@@ -14,3 +14,9 @@ to your directory of my python for android fork (line 103)
 
 # (str) python-for-android git clone directory (if empty, it will be automatically cloned from github)
 android.p4a_dir = /home/tbeier/src/python-for-android
+
+
+
+
+
+make to use buildozer to build the android package and use "deploy android_new"
