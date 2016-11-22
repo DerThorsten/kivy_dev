@@ -4,6 +4,8 @@ import random
 from kivy.app import App
 from kivy.uix.widget import Widget
 from kivy.uix.button import Button
+from kivy.uix.label import Label
+from kivy.uix.popup import Popup
 from kivy.graphics import Color, Ellipse, Line
 from kivy.clock import mainthread
 
@@ -57,11 +59,17 @@ class MyPaintApp(App):
         """
         Set up a ZMQ context and an incoming and outgoing socket
         """
-        serverIp = self.config.get('CoopPaint', 'ip')
-        print("Starting instance with ID {}, connecting to server at {}".format(self.myId, serverIp))
+        try:
+            serverIp = self.config.get('CoopPaint', 'ip')
+            print("Starting instance with ID {}, connecting to server at {}".format(self.myId, serverIp))
 
-        port = 5559
-        self.socket = cooppaintsocket.CoopPaintSocket(serverIp, port)
+            port = 5559
+            self.socket = cooppaintsocket.CoopPaintSocket(serverIp, port)
+        except:
+            self.socket = None
+            popup = Popup(title='Error', content=Label(text='Could not connect to server {}'.format(serverIp)),
+              auto_dismiss=False)
+            popup.open()
     
     def networkReceiver(self):
         print("Starting listener thread")
