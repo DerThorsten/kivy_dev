@@ -8,13 +8,14 @@ from kivy.graphics import Color, Ellipse, Line
 from kivy.clock import mainthread
 
 import sys
-import zmq
+import cooppaintsocket
 import json
 import threading
+import socket
 
 class MyPaintWidget(Widget):
     color = None
-    outgoingSocket = None
+    socket = None
     myId = None
     lock = None
 
@@ -41,7 +42,8 @@ class MyPaintWidget(Widget):
             message = json.dumps(messageDict)
             print("Sending message: " + message)
             with self.lock:
-            self.outgoingSocket.send(message)
+                print("Beginning to send...")
+                self.socket.send(message)
     
     @mainthread
     def addLine(self, color, points):
@@ -58,23 +60,17 @@ class MyPaintApp(App):
         serverIp = self.config.get('CoopPaint', 'ip')
         print("Starting instance with ID {}, connecting to server at {}".format(self.myId, serverIp))
 
-        outgoingPort = "5559"
-        self.outgoingSocket = self.context.socket(zmq.PUB)
-        self.outgoingSocket.connect("tcp://{}:{}".format(serverIp, outgoingPort))
-
-        incomingPort = "5560"
-        self.incomingSocket = self.context.socket(zmq.SUB)
-        self.incomingSocket.connect("tcp://{}:{}".format(serverIp, incomingPort))
-        self.incomingSocket.setsockopt(zmq.SUBSCRIBE, "")
+        port = 5559
+        self.socket = cooppaintsocket.CoopPaintSocket(serverIp, port)
     
     def networkReceiver(self):
         print("Starting listener thread")
         while True:
-            with self.lock:
-                try:
-                    message = self.incomingSocket.recv(flags=zmq.NOBLOCK)
-                except zmq.Again:
-                    message = None
+            # with self.lock:
+            try:
+                message = self.socket.receive()
+            except socket.error:
+                message = None
             if message is not None:
                 print("received message: " + message)
                 messageDict = json.loads(message)
@@ -82,8 +78,8 @@ class MyPaintApp(App):
                     self.painter.addLine(messageDict['color'], messageDict['points'])
     
     def teardownNetwork(self):
-        self.incomingSocket.close()
-        self.outgoingSocket.close()
+        print("Closing socket")
+        self.socket.close()
 
     def build(self):
         """
@@ -93,14 +89,13 @@ class MyPaintApp(App):
         self.lock = threading.Lock()
 
         with self.lock:
-        self.context = zmq.Context()
-        self.networkingSetup()
+            self.networkingSetup()
 
         parent = Widget()
         self.painter = MyPaintWidget()
-        self.painter.outgoingSocket = self.outgoingSocket
+        self.painter.socket = self.socket
         self.painter.myId = self.myId
-        self.painter.lock = self.lock
+        self.painter.lock = self.lock # lock needed to stop reading once we're changing the network config
 
         # start thread that waits for network input
         t = threading.Thread(target=self.networkReceiver)
@@ -133,6 +128,10 @@ class MyPaintApp(App):
         '''
 
         settings.add_json_panel('CoopPaint', self.config, data=settingsJson)
+
+    def on_stop(self):
+        with self.lock:
+            self.teardownNetwork()
     
     def on_config_change(self, config, section, key, value):
         """
@@ -144,9 +143,9 @@ class MyPaintApp(App):
         if section == "CoopPaint":
             if key == "ip":
                 with self.lock:
-                self.teardownNetwork()
-                self.networkingSetup()
-                    self.painter.outgoingSocket = self.outgoingSocket
+                    self.teardownNetwork()
+                    self.networkingSetup()
+                    self.painter.socket = self.socket
 
 if __name__ == '__main__':
     MyPaintApp().run()
