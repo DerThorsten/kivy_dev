@@ -52,8 +52,8 @@ class CoopPaintSocket(socket.socket):
             msg_len = struct.unpack('>I', msg_len)[0]
             tot_data_len = 0
             while tot_data_len < msg_len:
-                # Retrieves the chunk i-th chunk of RECV_BUFFER size
-                chunk = sock.recv(self.RECV_BUFFER)
+                # Retrieves the i-th chunk of RECV_BUFFER size
+                chunk = sock.recv(min(self.RECV_BUFFER, msg_len - tot_data_len))
                 # If there isn't the expected chunk...
                 if not chunk:
                     data = None
