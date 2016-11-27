@@ -87,7 +87,7 @@ class CoopPaintServer(cooppaintsocket.CoopPaintSocket, threading.Thread):
                                 sock.close()
                                 self.connections.remove(sock)    
                         except socket.error:
-                            print "Client %s is offline" % sock.getsockname()
+                            print("Client {} is offline".format(clientName))
                             sock.close()
                             self.connections.remove(sock)
                             continue
@@ -119,7 +119,7 @@ class CoopPaintServer(cooppaintsocket.CoopPaintSocket, threading.Thread):
 
 def main():
     try:
-        coopPaintServer = CoopPaintServer('localhost', 5559)
+        coopPaintServer = CoopPaintServer('', 5559)
         coopPaintServer.start()
         print("Server running. Press ctrl+c to quit")
 
